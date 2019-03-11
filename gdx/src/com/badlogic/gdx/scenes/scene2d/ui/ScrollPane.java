@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +60,10 @@ public class ScrollPane extends WidgetGroup {
 	float amountX, amountY;
 	float visualAmountX, visualAmountY;
 	float maxX, maxY;
-	boolean touchScrollH, touchScrollV;
+	boolean touchScrollH;
+
+	public boolean invertY;
+	public boolean touchScrollV;
 	final Vector2 lastPoint = new Vector2();
 	boolean fadeScrollBars = true, smoothScrolling = true, scrollBarTouch = true;
 	float fadeAlpha, fadeAlphaSeconds = 1, fadeDelay, fadeDelaySeconds = 1;
@@ -71,11 +74,18 @@ public class ScrollPane extends WidgetGroup {
 	private boolean overscrollX = true, overscrollY = true;
 	private float overscrollDistance = 50, overscrollSpeedMin = 30, overscrollSpeedMax = 200;
 	private boolean forceScrollX, forceScrollY;
-	boolean disableX, disableY;
+	public boolean disableX, disableY;
 	private boolean clamp = true;
 	private boolean scrollbarsOnTop;
 	private boolean variableSizeKnobs = true;
 	int draggingPointer = -1;
+
+	/** Disable drag. */
+	public boolean dragDisabled = false;
+
+	public ScrollPane() {
+
+	}
 
 	/** @param widget May be null. */
 	public ScrollPane (@Null Actor widget) {
@@ -230,6 +240,7 @@ public class ScrollPane extends WidgetGroup {
 					setScrollX(amountX + getMouseWheelX() * scrollAmountX);
 				} else
 					return false;
+				}
 				return true;
 			}
 		});
@@ -264,10 +275,10 @@ public class ScrollPane extends WidgetGroup {
 
 	void clamp () {
 		if (!clamp) return;
-		scrollX(overscrollX ? MathUtils.clamp(amountX, -overscrollDistance, maxX + overscrollDistance)
-			: MathUtils.clamp(amountX, 0, maxX));
-		scrollY(overscrollY ? MathUtils.clamp(amountY, -overscrollDistance, maxY + overscrollDistance)
-			: MathUtils.clamp(amountY, 0, maxY));
+		scrollX(overscrollX ? MathUtils.clamp(amountX, -overscrollDistance, maxX + overscrollDistance) : MathUtils.clamp(amountX,
+			0, maxX));
+		scrollY(overscrollY ? MathUtils.clamp(amountY, -overscrollDistance, maxY + overscrollDistance) : MathUtils.clamp(amountY,
+			0, maxY));
 	}
 
 	public void setStyle (ScrollPaneStyle style) {
@@ -352,7 +363,7 @@ public class ScrollPane extends WidgetGroup {
 				} else if (amountX > maxX) {
 					setScrollbarsVisible(true);
 					amountX -= (overscrollSpeedMin
-						+ (overscrollSpeedMax - overscrollSpeedMin) * -(maxX - amountX) / overscrollDistance) * delta;
+							+ (overscrollSpeedMax - overscrollSpeedMin) * -(maxX - amountX) / overscrollDistance) * delta;
 					if (amountX < maxX) scrollX(maxX);
 					animating = true;
 				}
@@ -367,7 +378,7 @@ public class ScrollPane extends WidgetGroup {
 				} else if (amountY > maxY) {
 					setScrollbarsVisible(true);
 					amountY -= (overscrollSpeedMin
-						+ (overscrollSpeedMax - overscrollSpeedMin) * -(maxY - amountY) / overscrollDistance) * delta;
+							+ (overscrollSpeedMax - overscrollSpeedMin) * -(maxY - amountY) / overscrollDistance) * delta;
 					if (amountY < maxY) scrollY(maxY);
 					animating = true;
 				}
@@ -492,6 +503,8 @@ public class ScrollPane extends WidgetGroup {
 				vScrollBounds.set(0, 0, 0, 0);
 				vKnobBounds.set(0, 0, 0, 0);
 			}
+			//
+			amountY = maxY;
 		}
 
 		updateWidgetPosition();
@@ -516,6 +529,9 @@ public class ScrollPane extends WidgetGroup {
 		}
 	}
 
+	protected void layoutChanged() {}
+
+	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		if (widget == null) return;
 
@@ -524,7 +540,8 @@ public class ScrollPane extends WidgetGroup {
 		// Setup transform for this group.
 		applyTransform(batch, computeTransform());
 
-		if (scrollX) hKnobBounds.x = hScrollBounds.x + (int)((hScrollBounds.width - hKnobBounds.width) * getVisualScrollPercentX());
+		if (scrollX)
+			hKnobBounds.x = hScrollBounds.x + (int)((hScrollBounds.width - hKnobBounds.width) * getVisualScrollPercentX());
 		if (scrollY)
 			vKnobBounds.y = vScrollBounds.y + (int)((vScrollBounds.height - vKnobBounds.height) * (1 - getVisualScrollPercentY()));
 
@@ -733,12 +750,12 @@ public class ScrollPane extends WidgetGroup {
 	}
 
 	/** Called whenever the visual x scroll amount is changed. */
-	protected void visualScrollX (float pixelsX) {
+	public void visualScrollX (float pixelsX) {
 		this.visualAmountX = pixelsX;
 	}
 
 	/** Called whenever the visual y scroll amount is changed. */
-	protected void visualScrollY (float pixelsY) {
+	public void visualScrollY (float pixelsY) {
 		this.visualAmountY = pixelsY;
 	}
 
@@ -854,6 +871,20 @@ public class ScrollPane extends WidgetGroup {
 			if (amountY > maxY - y - height + widgetArea.height) amountY = maxY - y - height + widgetArea.height;
 			if (amountY < maxY - y) amountY = maxY - y;
 		}
+		scrollY(MathUtils.clamp(amountY, 0, maxY));
+	}
+
+	/** Sets the scroll offset so the specified rectangle is fully in view and centered vertically in the scroll pane, if possible.
+	 * Coordinates are in the scroll pane widget's coordinate system. */
+	public void scrollToCenter (float x, float y, float width, float height) {
+		float amountX = this.amountX;
+		if (x + width > amountX + areaWidth) amountX = x + width - areaWidth;
+		if (x < amountX) amountX = x;
+		scrollX(MathUtils.clamp(amountX, 0, maxX));
+
+		float amountY = this.amountY;
+		float centerY = maxY - y + areaHeight / 2 - height / 2;
+		if (amountY < centerY - areaHeight / 4 || amountY > centerY + areaHeight / 4) amountY = centerY;
 		scrollY(MathUtils.clamp(amountY, 0, maxY));
 	}
 
