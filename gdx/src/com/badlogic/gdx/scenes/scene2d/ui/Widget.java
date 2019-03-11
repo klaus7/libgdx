@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,13 +22,13 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 
-/** An {@link Actor} that participates in layout and provides a minimum, preferred, and maximum size.
+/** An {@link com.badlogic.gdx.scenes.scene2d.Actor} that participates in layout and provides a minimum, preferred, and maximum size.
  * <p>
  * The default preferred size of a widget is 0 and this is almost always overridden by a subclass. The default minimum size
  * returns the preferred size, so a subclass may choose to return 0 if it wants to allow itself to be sized smaller. The default
  * maximum size is 0, which means no maximum size.
  * <p>
- * See {@link Layout} for details on how a widget should participate in layout. A widget's mutator methods should call
+ * See {@link com.badlogic.gdx.scenes.scene2d.utils.Layout} for details on how a widget should participate in layout. A widget's mutator methods should call
  * {@link #invalidate()} or {@link #invalidateHierarchy()} as needed.
  * @author mzechner
  * @author Nathan Sweet */
@@ -36,6 +36,7 @@ public class Widget extends Actor implements Layout {
 	private boolean needsLayout = true;
 	private boolean fillParent;
 	private boolean layoutEnabled = true;
+	private boolean yDown = true;
 
 	public float getMinWidth () {
 		return getPrefWidth();
@@ -123,5 +124,13 @@ public class Widget extends Actor implements Layout {
 	}
 
 	public void layout () {
+	}
+
+	public boolean isyDown() {
+		return yDown;
+	}
+
+	public void setyDown(boolean yDown) {
+		this.yDown = yDown;
 	}
 }

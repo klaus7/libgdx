@@ -18,11 +18,13 @@ package com.badlogic.gdx.graphics;
 
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.io.Serializable;
+
 /** A color class, holding the r, g, b and alpha component as floats in the range [0,1]. All methods perform clamping on the
  * internal values after execution.
  * 
  * @author mzechner */
-public class Color {
+public class Color implements Serializable {
 	public static final Color CLEAR = new Color(0, 0, 0, 0);
 	public static final Color BLACK = new Color(0, 0, 0, 1);
 
@@ -65,25 +67,27 @@ public class Color {
 	public static final Color VIOLET = new Color(0xee82eeff);
 	public static final Color MAROON = new Color(0xb03060ff);
 
+	@Deprecated public static Color tmp = new Color();
+
 	/** the red, green, blue and alpha components **/
 	public float r, g, b, a;
 
 	/** Constructs a new Color with all components set to 0. */
-	public Color () {
+	public Color() {
 	}
 
 	/** @see #rgba8888ToColor(Color, int) */
-	public Color (int rgba8888) {
+	public Color(int rgba8888) {
 		rgba8888ToColor(this, rgba8888);
 	}
 
 	/** Constructor, sets the components of the color
-	 * 
+	 *
 	 * @param r the red component
 	 * @param g the green component
 	 * @param b the blue component
 	 * @param a the alpha component */
-	public Color (float r, float g, float b, float a) {
+	public Color(float r, float g, float b, float a) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
@@ -92,14 +96,14 @@ public class Color {
 	}
 
 	/** Constructs a new color using the given color
-	 * 
+	 *
 	 * @param color the color */
-	public Color (Color color) {
+	public Color(Color color) {
 		set(color);
 	}
 
 	/** Sets this color to the given color.
-	 * 
+	 *
 	 * @param color the Color */
 	public Color set (Color color) {
 		this.r = color.r;
@@ -110,7 +114,7 @@ public class Color {
 	}
 
 	/** Multiplies the this color and the given color
-	 * 
+	 *
 	 * @param color the color
 	 * @return this color. */
 	public Color mul (Color color) {
@@ -122,7 +126,7 @@ public class Color {
 	}
 
 	/** Multiplies all components of this Color with the given value.
-	 * 
+	 *
 	 * @param value the value
 	 * @return this color */
 	public Color mul (float value) {
@@ -134,7 +138,7 @@ public class Color {
 	}
 
 	/** Adds the given color to this color.
-	 * 
+	 *
 	 * @param color the color
 	 * @return this color */
 	public Color add (Color color) {
@@ -146,7 +150,7 @@ public class Color {
 	}
 
 	/** Subtracts the given color from this color
-	 * 
+	 *
 	 * @param color the color
 	 * @return this color */
 	public Color sub (Color color) {
@@ -179,12 +183,12 @@ public class Color {
 	}
 
 	/** Sets this Color's component values.
-	 * 
+	 *
 	 * @param r Red component
 	 * @param g Green component
 	 * @param b Blue component
 	 * @param a Alpha component
-	 * 
+	 *
 	 * @return this Color for chaining */
 	public Color set (float r, float g, float b, float a) {
 		this.r = r;
@@ -195,7 +199,7 @@ public class Color {
 	}
 
 	/** Sets this color's component values through an integer representation.
-	 * 
+	 *
 	 * @return this Color for chaining
 	 * @see #rgba8888ToColor(Color, int) */
 	public Color set (int rgba) {
@@ -204,12 +208,12 @@ public class Color {
 	}
 
 	/** Adds the given color component values to this Color's values.
-	 * 
+	 *
 	 * @param r Red component
 	 * @param g Green component
 	 * @param b Blue component
 	 * @param a Alpha component
-	 * 
+	 *
 	 * @return this Color for chaining */
 	public Color add (float r, float g, float b, float a) {
 		this.r += r;
@@ -220,12 +224,12 @@ public class Color {
 	}
 
 	/** Subtracts the given values from this Color's component values.
-	 * 
+	 *
 	 * @param r Red component
 	 * @param g Green component
 	 * @param b Blue component
 	 * @param a Alpha component
-	 * 
+	 *
 	 * @return this Color for chaining */
 	public Color sub (float r, float g, float b, float a) {
 		this.r -= r;
@@ -236,12 +240,12 @@ public class Color {
 	}
 
 	/** Multiplies this Color's color components by the given ones.
-	 * 
+	 *
 	 * @param r Red component
 	 * @param g Green component
 	 * @param b Blue component
 	 * @param a Alpha component
-	 * 
+	 *
 	 * @return this Color for chaining */
 	public Color mul (float r, float g, float b, float a) {
 		this.r *= r;
@@ -251,8 +255,8 @@ public class Color {
 		return clamp();
 	}
 
-	/** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
-	 * this color.
+	/** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in this
+	 * color.
 	 * @param target The target color
 	 * @param t The interpolation coefficient
 	 * @return This color for chaining. */
@@ -264,8 +268,8 @@ public class Color {
 		return clamp();
 	}
 
-	/** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
-	 * this color.
+	/** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in this
+	 * color.
 	 * @param r The red component of the target color
 	 * @param g The green component of the target color
 	 * @param b The blue component of the target color
@@ -307,7 +311,7 @@ public class Color {
 
 	/** Packs the color components into a 32-bit integer with the format ABGR and then converts it to a float.
 	 * @return the packed color as a 32-bit float
-	 * @see NumberUtils#intToFloatColor(int) */
+	 * @see com.badlogic.gdx.utils.NumberUtils#intToFloatColor(int) */
 	public float toFloatBits () {
 		int color = ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
 		return NumberUtils.intToFloatColor(color);
@@ -322,8 +326,8 @@ public class Color {
 
 	/** Returns the color encoded as hex string with the format RRGGBBAA. */
 	public String toString () {
-		String value = Integer
-			.toHexString(((int)(255 * r) << 24) | ((int)(255 * g) << 16) | ((int)(255 * b) << 8) | ((int)(255 * a)));
+		String value = Integer.toHexString(((int)(255 * r) << 24) | ((int)(255 * g) << 16) | ((int)(255 * b) << 8)
+			| ((int)(255 * a)));
 		while (value.length() < 8)
 			value = "0" + value;
 		return value;
@@ -332,7 +336,6 @@ public class Color {
 	/** Returns a new color from a hex string with the format RRGGBBAA.
 	 * @see #toString() */
 	public static Color valueOf (String hex) {
-		hex = hex.charAt(0) == '#' ? hex.substring(1) : hex;
 		int r = Integer.valueOf(hex.substring(0, 2), 16);
 		int g = Integer.valueOf(hex.substring(2, 4), 16);
 		int b = Integer.valueOf(hex.substring(4, 6), 16);
@@ -347,7 +350,7 @@ public class Color {
 	 * @param b the blue component, 0 - 255
 	 * @param a the alpha component, 0 - 255
 	 * @return the packed color as a float
-	 * @see NumberUtils#intToFloatColor(int) */
+	 * @see com.badlogic.gdx.utils.NumberUtils#intToFloatColor(int) */
 	public static float toFloatBits (int r, int g, int b, int a) {
 		int color = (a << 24) | (b << 16) | (g << 8) | r;
 		float floatColor = NumberUtils.intToFloatColor(color);
@@ -356,7 +359,7 @@ public class Color {
 
 	/** Packs the color components into a 32-bit integer with the format ABGR and then converts it to a float.
 	 * @return the packed color as a 32-bit float
-	 * @see NumberUtils#intToFloatColor(int) */
+	 * @see com.badlogic.gdx.utils.NumberUtils#intToFloatColor(int) */
 	public static float toFloatBits (float r, float g, float b, float a) {
 		int color = ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
 		return NumberUtils.intToFloatColor(color);
@@ -397,10 +400,6 @@ public class Color {
 		return ((int)(r * 255) << 24) | ((int)(g * 255) << 16) | ((int)(b * 255) << 8) | (int)(a * 255);
 	}
 
-	public static int argb8888 (float a, float r, float g, float b) {
-		return ((int)(a * 255) << 24) | ((int)(r * 255) << 16) | ((int)(g * 255) << 8) | (int)(b * 255);
-	}
-
 	public static int rgb565 (Color color) {
 		return ((int)(color.r * 31) << 11) | ((int)(color.g * 63) << 5) | (int)(color.b * 31);
 	}
@@ -417,10 +416,6 @@ public class Color {
 		return ((int)(color.r * 255) << 24) | ((int)(color.g * 255) << 16) | ((int)(color.b * 255) << 8) | (int)(color.a * 255);
 	}
 
-	public static int argb8888 (Color color) {
-		return ((int)(color.a * 255) << 24) | ((int)(color.r * 255) << 16) | ((int)(color.g * 255) << 8) | (int)(color.b * 255);
-	}
-
 	/** Sets the Color components using the specified integer value in the format RGB565. This is inverse to the rgb565(r, g, b)
 	 * method.
 	 * 
@@ -432,8 +427,8 @@ public class Color {
 		color.b = ((value & 0x0000001F) >>> 0) / 31f;
 	}
 
-	/** Sets the Color components using the specified integer value in the format RGBA4444. This is inverse to the rgba4444(r, g,
-	 * b, a) method.
+	/** Sets the Color components using the specified integer value in the format RGBA4444. This is inverse to the rgba4444(r, g, b,
+	 * a) method.
 	 * 
 	 * @param color The Color to be modified.
 	 * @param value An integer color value in RGBA4444 format. */
@@ -455,8 +450,8 @@ public class Color {
 		color.b = ((value & 0x000000ff)) / 255f;
 	}
 
-	/** Sets the Color components using the specified integer value in the format RGBA8888. This is inverse to the rgba8888(r, g,
-	 * b, a) method.
+	/** Sets the Color components using the specified integer value in the format RGBA8888. This is inverse to the rgba8888(r, g, b,
+	 * a) method.
 	 * 
 	 * @param color The Color to be modified.
 	 * @param value An integer color value in RGBA8888 format. */
@@ -467,114 +462,51 @@ public class Color {
 		color.a = ((value & 0x000000ff)) / 255f;
 	}
 
-	/** Sets the Color components using the specified integer value in the format ARGB8888. This is the inverse to the argb8888(a,
-	 * r, g, b) method
-	 *
-	 * @param color The Color to be modified.
-	 * @param value An integer color value in ARGB8888 format. */
-	public static void argb8888ToColor (Color color, int value) {
-		color.a = ((value & 0xff000000) >>> 24) / 255f;
-		color.r = ((value & 0x00ff0000) >>> 16) / 255f;
-		color.g = ((value & 0x0000ff00) >>> 8) / 255f;
-		color.b = ((value & 0x000000ff)) / 255f;
-	}
-
-	/** Sets the Color components using the specified float value in the format ABGB8888.
-	 * @param color The Color to be modified. */
-	public static void abgr8888ToColor (Color color, float value) {
-		int c = NumberUtils.floatToIntColor(value);
-		color.a = ((c & 0xff000000) >>> 24) / 255f;
-		color.b = ((c & 0x00ff0000) >>> 16) / 255f;
-		color.g = ((c & 0x0000ff00) >>> 8) / 255f;
-		color.r = ((c & 0x000000ff)) / 255f;
-	}
-
-	/** Sets the RGB Color components using the specified Hue-Saturation-Value. Note that HSV components are voluntary not clamped
-	 * to preserve high range color and can range beyond typical values.
-	 * @param h The Hue in degree from 0 to 360
-	 * @param s The Saturation from 0 to 1
-	 * @param v The Value (brightness) from 0 to 1
-	 * @return The modified Color for chaining. */
-	public Color fromHsv (float h, float s, float v) {
-		float x = (h / 60f + 6) % 6;
-		int i = (int)x;
-		float f = x - i;
-		float p = v * (1 - s);
-		float q = v * (1 - s * f);
-		float t = v * (1 - s * (1 - f));
-		switch (i) {
-		case 0:
-			r = v;
-			g = t;
-			b = p;
-			break;
-		case 1:
-			r = q;
-			g = v;
-			b = p;
-			break;
-		case 2:
-			r = p;
-			g = v;
-			b = t;
-			break;
-		case 3:
-			r = p;
-			g = q;
-			b = v;
-			break;
-		case 4:
-			r = t;
-			g = p;
-			b = v;
-			break;
-		default:
-			r = v;
-			g = p;
-			b = q;
-		}
-
-		return clamp();
-	}
-
-	/** Sets RGB components using the specified Hue-Saturation-Value. This is a convenient method for
-	 * {@link #fromHsv(float, float, float)}. This is the inverse of {@link #toHsv(float[])}.
-	 * @param hsv The Hue, Saturation and Value components in that order.
-	 * @return The modified Color for chaining. */
-	public Color fromHsv (float[] hsv) {
-		return fromHsv(hsv[0], hsv[1], hsv[2]);
-	}
-
-	/** Extract Hue-Saturation-Value. This is the inverse of {@link #fromHsv(float[])}.
-	 * @param hsv The HSV array to be modified.
-	 * @return HSV components for chaining. */
-	public float[] toHsv (float[] hsv) {
-		float max = Math.max(Math.max(r, g), b);
-		float min = Math.min(Math.min(r, g), b);
-		float range = max - min;
-		if (range == 0) {
-			hsv[0] = 0;
-		} else if (max == r) {
-			hsv[0] = (60 * (g - b) / range + 360) % 360;
-		} else if (max == g) {
-			hsv[0] = 60 * (b - r) / range + 120;
-		} else {
-			hsv[0] = 60 * (r - g) / range + 240;
-		}
-
-		if (max > 0) {
-			hsv[1] = 1 - min / max;
-		} else {
-			hsv[1] = 0;
-		}
-
-		hsv[2] = max;
-
-		return hsv;
+	/** Returns a temporary copy of this color. This is not thread safe, do not save a reference to this instance.
+	 * 
+	 * @return a temporary copy of this color */
+	public Color tmp () {
+		return tmp.set(this);
 	}
 
 	/** @return a copy of this color */
 	public Color cpy () {
 		return new Color(this);
+	}
+
+	public void add(float scl) {
+		add(scl, scl, scl, scl);
+	}
+
+	public float getR() {
+		return r;
+	}
+
+	public void setR(float r) {
+		this.r = r;
+	}
+
+	public float getG() {
+		return g;
+	}
+
+	public void setG(float g) {
+		this.g = g;
+	}
+
+	public float getB() {
+		return b;
+	}
+
+	public void setB(float b) {
+		this.b = b;
+	}
+
+	public float getA() {
+		return a;
+	}
+
+	public void setA(float a) {
+		this.a = a;
 	}
 }
