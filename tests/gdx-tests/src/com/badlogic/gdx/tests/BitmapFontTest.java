@@ -19,7 +19,6 @@ package com.badlogic.gdx.tests;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
@@ -34,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.tests.utils.GdxTest;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class BitmapFontTest extends GdxTest {
@@ -42,6 +42,7 @@ public class BitmapFontTest extends GdxTest {
 	private BitmapFont font;
 	private ShapeRenderer renderer;
 	private BitmapFont multiPageFont;
+	private BitmapFont smallFont;
 	private GlyphLayout layout;
 	private Label label;
 
@@ -50,6 +51,7 @@ public class BitmapFontTest extends GdxTest {
 		spriteBatch = new SpriteBatch();
 		// font = new BitmapFont(Gdx.files.internal("data/verdana39.fnt"), false);
 		font = new BitmapFont(Gdx.files.internal("data/arial-32-pad.fnt"), false);
+		smallFont = new BitmapFont(); // uses Arial 15, the default
 		// font = new FreeTypeFontGenerator(Gdx.files.internal("data/arial.ttf")).generateFont(new FreeTypeFontParameter());
 		font.getData().markupEnabled = true;
 		font.getData().breakChars = new char[] {'-'};
@@ -89,11 +91,10 @@ public class BitmapFontTest extends GdxTest {
 
 		int viewHeight = Gdx.graphics.getHeight();
 
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 1);
 
 		// Test wrapping or truncation with the font directly.
-		if (true) {
+		if (false) {
 			// BitmapFont font = label.getStyle().font;
 			BitmapFont font = this.font;
 			font.getRegion().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
@@ -204,6 +205,14 @@ public class BitmapFontTest extends GdxTest {
 			// tinting
 			cache.tint(new Color(1f, 1f, 1f, 0.3f));
 			cache.translate(0f, 40f);
+			cache.draw(spriteBatch);
+
+			cache = smallFont.getCache();
+			// String neeeds to be pretty long to trigger the crash described in #5834; fixed now
+			final String trogdor = "TROGDOR! TROGDOR! Trogdor was a man! Or maybe he was a... Dragon-Man!";
+			cache.clear();
+			cache.addText(trogdor, 24, 37, 500, Align.center, true);
+			cache.setColors(Color.FOREST, 0, trogdor.length());
 			cache.draw(spriteBatch);
 
 			spriteBatch.end();

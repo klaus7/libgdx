@@ -18,13 +18,13 @@ package com.badlogic.gdx.tests.gwt;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.tests.utils.GdxTest;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GwtInputTest extends GdxTest {
 	ShapeRenderer renderer;
@@ -36,12 +36,12 @@ public class GwtInputTest extends GdxTest {
 		renderer = new ShapeRenderer();
 		Gdx.input.setInputProcessor(this);
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		Gdx.input.setCursorCatched(true);
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 1);
 		renderer.begin(ShapeType.Filled);
 		if (Gdx.input.isTouched())
 			renderer.setColor(Color.RED);
@@ -71,6 +71,15 @@ public class GwtInputTest extends GdxTest {
 
 		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
 			y -= 1;
+		}
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+			Gdx.app.log("GwtInputTest", "button pressed: LEFT");
+		}
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.MIDDLE)){
+			Gdx.app.log("GwtInputTest", "button pressed: MIDDLE");
+		}
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
+			Gdx.app.log("GwtInputTest", "button pressed: RIGHT");
 		}
 	}
 

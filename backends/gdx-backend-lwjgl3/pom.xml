@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.badlogicgames.gdx</groupId>
     <artifactId>gdx-parent</artifactId>
-    <version>1.9.10-SNAPSHOT</version>
+    <version>1.9.15-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -36,7 +36,28 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl</artifactId>
       <version>${lwjgl3.version}</version>
+      <classifier>natives-windows-x86</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl3.version}</version>
       <classifier>natives-linux</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm32</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm64</classifier>
     </dependency>
 
     <dependency>
@@ -46,6 +67,15 @@
       <classifier>natives-macos</classifier>
     </dependency>
 
+    <!--
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-macos-arm64</classifier>
+    </dependency>
+    -->
+
     <dependency>
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-glfw</artifactId>
@@ -63,7 +93,28 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-glfw</artifactId>
       <version>${lwjgl3.version}</version>
+      <classifier>natives-windows-x86</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-glfw</artifactId>
+      <version>${lwjgl3.version}</version>
       <classifier>natives-linux</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-glfw</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm32</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-glfw</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm64</classifier>
     </dependency>
 
     <dependency>
@@ -72,6 +123,15 @@
       <version>${lwjgl3.version}</version>
       <classifier>natives-macos</classifier>
     </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-glfw</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-macos-arm64</classifier>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>org.lwjgl</groupId>
@@ -90,7 +150,28 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-jemalloc</artifactId>
       <version>${lwjgl3.version}</version>
+      <classifier>natives-windows-x86</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-jemalloc</artifactId>
+      <version>${lwjgl3.version}</version>
       <classifier>natives-linux</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-jemalloc</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm32</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-jemalloc</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm64</classifier>
     </dependency>
 
     <dependency>
@@ -100,6 +181,15 @@
       <classifier>natives-macos</classifier>
     </dependency>
 
+    <!--
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-jemalloc</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-macos-arm64</classifier>
+    </dependency>
+    -->
+
     <dependency>
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-opengl</artifactId>
@@ -117,7 +207,28 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-opengl</artifactId>
       <version>${lwjgl3.version}</version>
+      <classifier>natives-windows-x86</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-opengl</artifactId>
+      <version>${lwjgl3.version}</version>
       <classifier>natives-linux</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-opengl</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm32</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-opengl</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm64</classifier>
     </dependency>
 
     <dependency>
@@ -126,6 +237,15 @@
       <version>${lwjgl3.version}</version>
       <classifier>natives-macos</classifier>
     </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-opengl</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-macos-arm64</classifier>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>org.lwjgl</groupId>
@@ -144,7 +264,28 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-openal</artifactId>
       <version>${lwjgl3.version}</version>
+      <classifier>natives-windows-x86</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-openal</artifactId>
+      <version>${lwjgl3.version}</version>
       <classifier>natives-linux</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-openal</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm32</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-openal</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-linux-arm64</classifier>
     </dependency>
 
     <dependency>
@@ -153,6 +294,15 @@
       <version>${lwjgl3.version}</version>
       <classifier>natives-macos</classifier>
     </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-openal</artifactId>
+      <version>${lwjgl3.version}</version>
+      <classifier>natives-macos-arm64</classifier>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>com.badlogicgames.jlayer</groupId>

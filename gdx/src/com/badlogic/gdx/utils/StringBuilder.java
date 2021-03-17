@@ -497,7 +497,6 @@ public class StringBuilder implements Appendable, CharSequence {
 	/** Returns the current String representation.
 	 * 
 	 * @return a String containing the characters in this instance. */
-	@Override
 	public String toString () {
 		if (length == 0) return "";
 		return new String(chars, 0, length);
@@ -1254,11 +1253,18 @@ public class StringBuilder implements Appendable, CharSequence {
 		return this;
 	}
 
+	public boolean isEmpty () {
+		return length == 0;
+	}
+
+	public boolean notEmpty () {
+		return length != 0;
+	}
+
 	public int hashCode () {
-		final int prime = 31;
-		int result = 1;
-		result = prime + length;
-		result = prime * result + Arrays.hashCode(chars);
+		int result = 31 + length;
+		for (int index = 0; index < length; ++index)
+			result = 31 * result + chars[index];
 		return result;
 	}
 
@@ -1275,8 +1281,7 @@ public class StringBuilder implements Appendable, CharSequence {
 		return true;
 	}
 
-	/** @param other May be null. */
-	public boolean equalsIgnoreCase (StringBuilder other) {
+	public boolean equalsIgnoreCase (@Null StringBuilder other) {
 		if (this == other) return true;
 		if (other == null) return false;
 		int length = this.length;
@@ -1290,8 +1295,7 @@ public class StringBuilder implements Appendable, CharSequence {
 		return true;
 	}
 
-	/** @param other May be null. */
-	public boolean equalsIgnoreCase (String other) {
+	public boolean equalsIgnoreCase (@Null String other) {
 		if (other == null) return false;
 		int length = this.length;
 		if (length != other.length()) return false;
