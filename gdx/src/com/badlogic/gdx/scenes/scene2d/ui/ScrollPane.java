@@ -83,9 +83,7 @@ public class ScrollPane extends WidgetGroup {
 	/** Disable drag. */
 	public boolean dragDisabled = false;
 
-	public ScrollPane() {
-
-	}
+	public ScrollPane() {}
 
 	/** @param widget May be null. */
 	public ScrollPane (@Null Actor widget) {
@@ -238,7 +236,7 @@ public class ScrollPane extends WidgetGroup {
 					}
 					setScrollY(amountY + getMouseWheelY() * scrollAmountY);
 					setScrollX(amountX + getMouseWheelX() * scrollAmountX);
-				} else
+				} else {
 					return false;
 				}
 				return true;
@@ -877,6 +875,8 @@ public class ScrollPane extends WidgetGroup {
 	/** Sets the scroll offset so the specified rectangle is fully in view and centered vertically in the scroll pane, if possible.
 	 * Coordinates are in the scroll pane widget's coordinate system. */
 	public void scrollToCenter (float x, float y, float width, float height) {
+		float areaWidth = widgetArea.width;
+		float areaHeight = widgetArea.height;
 		float amountX = this.amountX;
 		if (x + width > amountX + areaWidth) amountX = x + width - areaWidth;
 		if (x < amountX) amountX = x;

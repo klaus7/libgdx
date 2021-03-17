@@ -576,6 +576,8 @@ public class Color implements Serializable {
 		hsv[2] = max;
 
 		return hsv;
+	}
+
 	/** Returns a temporary copy of this color. This is not thread safe, do not save a reference to this instance.
 	 *
 	 * @return a temporary copy of this color */

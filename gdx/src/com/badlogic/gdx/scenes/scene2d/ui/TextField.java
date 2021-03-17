@@ -32,11 +32,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Clipboard;
@@ -54,7 +51,7 @@ import java.lang.StringBuilder;
  * The preferred width of a text field is 150, a relatively arbitrary size.
  * <p>
  * The text field will copy the currently selected text when ctrl+c is pressed, and paste any text in the clipboard when ctrl+v is
- * pressed. Clipboard functionality is provided via the {@link com.badlogic.gdx.utils.Clipboard} interface. Currently there are two standard
+ * pressed. Clipboard functionality is provided via the {@link Clipboard} interface. Currently there are two standard
  * implementations, one for the desktop and one for Android. The Android clipboard is a stub, as copy & pasting on Android is not
  * supported yet.
  * <p>
@@ -156,6 +153,8 @@ public class TextField extends Widget implements Disableable {
 
 	protected int letterUnderCursor (float x) {
 		x -= textOffset + fontOffset - style.font.getData().cursorX - glyphPositions.get(visibleTextStart);
+		Drawable background = getBackgroundDrawable();
+		if (background != null) x -= style.background.getLeftWidth();
 		int n = this.glyphPositions.size;
 		float[] glyphPositions = this.glyphPositions.items;
 		for (int i = 1; i < n; i++) {
@@ -174,6 +173,10 @@ public class TextField extends Widget implements Disableable {
 	protected int[] wordUnderCursor (int at) {
 		String text = this.text;
 		int start = at, right = text.length(), left = 0, index = start;
+		if (at >= text.length()) {
+			left = text.length();
+			right = 0;
+		} else {
 		for (; index < right; index++) {
 			if (!isWordCharacter(text.charAt(index))) {
 				right = index;
@@ -185,6 +188,7 @@ public class TextField extends Widget implements Disableable {
 				left = index + 1;
 				break;
 			}
+		}
 		}
 		return new int[] {left, right};
 	}
@@ -229,23 +233,31 @@ public class TextField extends Widget implements Disableable {
 
 	protected void calculateOffsets () {
 		float visibleWidth = getWidth();
-		if (style.background != null) visibleWidth -= style.background.getLeftWidth() + style.background.getRightWidth();
+		Drawable background = getBackgroundDrawable();
+		if (background != null) visibleWidth -= background.getLeftWidth() + background.getRightWidth();
 
 		int glyphCount = glyphPositions.size;
 		float[] glyphPositions = this.glyphPositions.items;
 
-		// Check if the cursor has gone out the left or right side of the visible area and adjust renderoffset.
-		//float distance = glyphPositions[Math.max(0, cursor - 1)] + renderOffset;
-		float distance = glyphPositions[MathUtils.clamp(cursor - 1, 0, glyphPositions.length - 1)] + renderOffset;
+		// Check if the cursor has gone out the left or right side of the visible area and adjust renderOffset.
+		float distance = glyphPositions[Math.max(0, cursor - 1)] + renderOffset;
 		if (distance <= 0)
 			renderOffset -= distance;
 		else {
 			int index = Math.min(glyphCount - 1, cursor + 1);
 			float minX = glyphPositions[index] - visibleWidth;
-			if (-renderOffset < minX) {
-				renderOffset = -minX;
+			if (-renderOffset < minX) renderOffset = -minX;
 			}
+
+		// Prevent renderOffset from starting too close to the end, eg after text was deleted.
+		float maxOffset = 0;
+		float width = glyphPositions[glyphCount - 1];
+		for (int i = glyphCount - 2; i >= 0; i--) {
+			float x = glyphPositions[i];
+			if (width - x > visibleWidth) break;
+			maxOffset = x;
 		}
+		if (-renderOffset > maxOffset) renderOffset = -maxOffset;
 
 		// calculate first visible char based on render offset
 		visibleTextStart = 0;
@@ -275,10 +287,9 @@ public class TextField extends Widget implements Disableable {
 		if (hasSelection) {
 			int minIndex = Math.min(cursor, selectionStart);
 			int maxIndex = Math.max(cursor, selectionStart);
-			float minX = Math.max(glyphPositions[minIndex], -renderOffset);
-			float maxX = Math.min(glyphPositions[maxIndex], visibleWidth - renderOffset);
+			float minX = Math.max(glyphPositions[minIndex] - glyphPositions[visibleTextStart], -textOffset);
+			float maxX = Math.min(glyphPositions[maxIndex] - glyphPositions[visibleTextStart], visibleWidth - textOffset);
 			selectionX = minX;
-			if (renderOffset == 0) selectionX += textOffset;
 			selectionWidth = maxX - minX - style.font.getData().cursorX;
 		}
 	}
@@ -307,8 +318,7 @@ public class TextField extends Widget implements Disableable {
 			: ((focused && style.focusedFontColor != null) ? style.focusedFontColor : style.fontColor);
 		final Drawable selection = style.selection;
 		final Drawable cursorPatch = style.cursor;
-		final Drawable background = (disabled && style.disabledBackground != null) ? style.disabledBackground
-			: ((focused && style.focusedBackground != null) ? style.focusedBackground : style.background);
+		final Drawable background = getBackgroundDrawable();
 
 		Color color = getColor();
 		float x = getX();
@@ -366,7 +376,7 @@ public class TextField extends Widget implements Disableable {
 
 	/** Draws selection rectangle **/
 	protected void drawSelection (Drawable selection, Batch batch, BitmapFont font, float x, float y) {
-		selection.draw(batch, x + selectionX + renderOffset + fontOffset, y - textHeight - font.getDescent(), selectionWidth,
+		selection.draw(batch, x + textOffset + selectionX + fontOffset, y - textHeight - font.getDescent(), selectionWidth,
 				textHeight);
 	}
 
@@ -538,18 +548,20 @@ public class TextField extends Widget implements Disableable {
 		Vector2 currentCoords, boolean up) {
 		for (int i = 0, n = actors.size; i < n; i++) {
 			Actor actor = actors.get(i);
-			if (actor == this) continue;
 			if (actor instanceof TextField) {
+				if (actor == this) continue;
 				TextField textField = (TextField)actor;
 				if (textField.isDisabled() || !textField.focusTraversal || !textField.ascendantsVisible()) continue;
 				Vector2 actorCoords = actor.getParent().localToStageCoordinates(tmp3.set(actor.getX(), actor.getY()));
-				if ((actorCoords.y < currentCoords.y || (actorCoords.y == currentCoords.y && actorCoords.x > currentCoords.x)) ^ up) {
-					if (best == null
-						|| (actorCoords.y > bestCoords.y || (actorCoords.y == bestCoords.y && actorCoords.x < bestCoords.x)) ^ up) {
+				boolean below = actorCoords.y != currentCoords.y && (actorCoords.y < currentCoords.y ^ up);
+				boolean right = actorCoords.y == currentCoords.y && (actorCoords.x > currentCoords.x ^ up);
+				if (!below && !right) continue;
+				boolean better = best == null || (actorCoords.y != bestCoords.y && (actorCoords.y > bestCoords.y ^ up));
+				if (!better) better = actorCoords.y == bestCoords.y && (actorCoords.x < bestCoords.x ^ up);
+				if (better) {
 						best = (TextField)actor;
 						bestCoords.set(actorCoords);
 					}
-				}
 			} else if (actor instanceof Group)
 				best = findNextTextField(((Group)actor).getChildren(), best, bestCoords, currentCoords, up);
 		}
@@ -622,7 +634,7 @@ public class TextField extends Widget implements Disableable {
 		if (newText.equals(oldText)) return false;
 		if (toUpperCase) newText = newText.toUpperCase();
 		text = newText;
-		ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
+		ChangeEvent changeEvent = Pools.obtain(ChangeEvent.class);
 		boolean cancelled = fire(changeEvent);
 		if (cancelled) text = oldText;
 		Pools.free(changeEvent);
@@ -633,6 +645,10 @@ public class TextField extends Widget implements Disableable {
 	 * changes the text. */
 	public void setProgrammaticChangeEvents (boolean programmaticChangeEvents) {
 		this.programmaticChangeEvents = programmaticChangeEvents;
+	}
+
+	public boolean getProgrammaticChangeEvents () {
+		return programmaticChangeEvents;
 	}
 
 	public int getSelectionStart () {
@@ -701,12 +717,22 @@ public class TextField extends Widget implements Disableable {
 	}
 
 	public float getPrefHeight () {
-		float prefHeight = textHeight;
+		float topAndBottom = 0, minHeight = 0;
 		if (style.background != null) {
-			prefHeight = Math.max(prefHeight + style.background.getBottomHeight() + style.background.getTopHeight(),
-				style.background.getMinHeight());
+			topAndBottom = Math.max(topAndBottom, style.background.getBottomHeight() + style.background.getTopHeight());
+			minHeight = Math.max(minHeight, style.background.getMinHeight());
 		}
-		return prefHeight;
+		if (style.focusedBackground != null) {
+			topAndBottom = Math.max(topAndBottom,
+				style.focusedBackground.getBottomHeight() + style.focusedBackground.getTopHeight());
+			minHeight = Math.max(minHeight, style.focusedBackground.getMinHeight());
+		}
+		if (style.disabledBackground != null) {
+			topAndBottom = Math.max(topAndBottom,
+				style.disabledBackground.getBottomHeight() + style.disabledBackground.getTopHeight());
+			minHeight = Math.max(minHeight, style.disabledBackground.getMinHeight());
+		}
+		return Math.max(topAndBottom + textHeight, minHeight);
 	}
 
 	/** Sets text horizontal alignment (left, center or right).
@@ -874,57 +900,68 @@ public class TextField extends Widget implements Disableable {
 			boolean repeat = false;
 			boolean ctrl = UIUtils.ctrl();
 			boolean jump = ctrl && !passwordMode;
+			boolean handled = true;
 
 			if (ctrl) {
-				if (keycode == Keys.V) {
+				switch (keycode) {
+				case Keys.V:
 					paste(clipboard.getContents(), true);
 					repeat = true;
-				}
-				if (keycode == Keys.C || keycode == Keys.INSERT) {
+					break;
+				case Keys.C:
+				case Keys.INSERT:
 					copy();
 					return true;
-				}
-				if (keycode == Keys.X) {
+				case Keys.X:
 					cut(true);
 					return true;
-				}
-				if (keycode == Keys.A) {
+				case Keys.A:
 					selectAll();
 					return true;
-				}
-				if (keycode == Keys.Z) {
+				case Keys.Z:
 					String oldText = text;
 					setText(undoText);
 					undoText = oldText;
 					updateDisplayText();
 					return true;
+				default:
+					handled = false;
 				}
 			}
 
 			if (UIUtils.shift()) {
-				if (keycode == Keys.INSERT) paste(clipboard.getContents(), true);
-				if (keycode == Keys.FORWARD_DEL) cut(true);
+				switch (keycode) {
+				case Keys.INSERT:
+					paste(clipboard.getContents(), true);
+					break;
+				case Keys.FORWARD_DEL:
+					cut(true);
+					break;
+				}
+
 				selection:
 				{
 					int temp = cursor;
 					keys:
 					{
-						if (keycode == Keys.LEFT) {
+						switch (keycode) {
+						case Keys.LEFT:
 							moveCursor(false, jump);
 							repeat = true;
+							handled = true;
 							break keys;
-						}
-						if (keycode == Keys.RIGHT) {
+						case Keys.RIGHT:
 							moveCursor(true, jump);
 							repeat = true;
+							handled = true;
 							break keys;
-						}
-						if (keycode == Keys.HOME) {
+						case Keys.HOME:
 							goHome(jump);
+							handled = true;
 							break keys;
-						}
-						if (keycode == Keys.END) {
+						case Keys.END:
 							goEnd(jump);
+							handled = true;
 							break keys;
 						}
 						break selection;
@@ -936,31 +973,35 @@ public class TextField extends Widget implements Disableable {
 				}
 			} else {
 				// Cursor movement or other keys (kills selection).
-				if (keycode == Keys.LEFT) {
+				switch (keycode) {
+				case Keys.LEFT:
 					moveCursor(false, jump);
 					clearSelection();
 					repeat = true;
-				}
-				if (keycode == Keys.RIGHT) {
+					handled = true;
+					break;
+				case Keys.RIGHT:
 					moveCursor(true, jump);
 					clearSelection();
 					repeat = true;
-				}
-				if (keycode == Keys.HOME) {
+					handled = true;
+					break;
+				case Keys.HOME:
 					goHome(jump);
 					clearSelection();
-				}
-				if (keycode == Keys.END) {
+					handled = true;
+					break;
+				case Keys.END:
 					goEnd(jump);
 					clearSelection();
+					handled = true;
+					break;
 				}
 			}
 			cursor = MathUtils.clamp(cursor, 0, text.length());
 
-			if (repeat) {
-				scheduleKeyRepeatTask(keycode);
-			}
-			return true;
+			if (repeat) scheduleKeyRepeatTask(keycode);
+			return handled;
 		}
 
 		protected void scheduleKeyRepeatTask (int keycode) {
